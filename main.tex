@@ -1,0 +1,313 @@
+\documentclass[serif,mathserif,final]{beamer}
+\mode<presentation>{\usetheme{DFTFE}}
+\usepackage{amsmath,amsfonts,amssymb,pxfonts,eulervm,xspace}
+\usepackage{graphicx}
+\usepackage{ragged2e}
+\usepackage{psfrag}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{geometry}
+\usepackage[many]{tcolorbox}
+\usepackage{upgreek}
+%\usepackage{auto-pst-pdf}
+\graphicspath{{./figures/}}
+\usepackage[orientation=portrait,size=custom,height=119,width=84, scale=1.3]{beamerposter}
+\usepackage{multirow}
+\usepackage{braket}
+\DeclareMathAlphabet{\mathpzc}{OT1}{pzc}{m}{it}
+\newcommand{\DFTFE}{\texttt{DFT-FE}}
+\newcommand{\ASE}{\texttt{ASE}}
+
+%-------------------------------------------------------------------
+\title{\LARGE Daemonized DFT-FE\\
+\vspace{0.3em}
+\large A persistent, integration-ready DFT platform for scalable innovation in science and industry}
+\author{Mehul Darak, Kartick Ramakrishnan, Prof. Phani Motamarri (PI)}
+\institute[]{\normalsize{\color{black}Department of Computational and Data Sciences, Indian Institute of Science, Bengaluru, India\color{black}}}
+%-------------------------------------------------------------------
+
+% (keep all your macro definitions exactly as you had them)
+\newcommand{\parder}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\parsecder}[3]{\frac{\partial^2 #1}{\partial #2\; \partial #3}}
+\newcommand{\shp}[2]{N^{#1}_{#2}(\bx)}
+\newcommand{\bzero}{\mathbf{0}}
+\newcommand{\del}{\nabla}
+\newcommand{\bPsi}{\boldsymbol{\Psi}}
+\newcommand{\bvPsi}{\boldsymbol{\varPsi}}
+\newcommand{\varphibar}{\bar{\varphi}}
+\newcommand{\bcolon}{\boldsymbol{:}}
+\newcommand{\bb}{\boldsymbol{b}}
+\newcommand{\bc}{\boldsymbol{c}}
+\newcommand{\bff}{\boldsymbol{f}}
+\newcommand{\bg}{\boldsymbol{g}}
+\newcommand{\bh}{\boldsymbol{h}}
+\newcommand{\bk}{\boldsymbol{k}}
+\newcommand{\bl}{\boldsymbol{l}}
+\newcommand{\bn}{\boldsymbol{n}}
+\newcommand{\bp}{\boldsymbol{p}}
+\newcommand{\bq}{\boldsymbol{q}}
+\newcommand{\br}{\boldsymbol{r}}
+\newcommand{\bv}{\boldsymbol{v}}
+\newcommand{\bs}{\boldsymbol{s}}
+\newcommand{\bt}{\boldsymbol{t}}
+\newcommand{\bu}{\boldsymbol{u}}
+\newcommand{\bx}{\boldsymbol{\textbf{x}}}
+\newcommand{\bA}{\boldsymbol{A}}
+\newcommand{\bB}{\boldsymbol{B}}
+\newcommand{\bC}{\boldsymbol{C}}
+\newcommand{\bE}{\boldsymbol{E}}
+\newcommand{\bF}{\boldsymbol{F}}
+\newcommand{\bH}{\boldsymbol{\textbf{H}}}
+\newcommand{\bI}{\boldsymbol{I}}
+\newcommand{\bK}{\boldsymbol{K}}
+\newcommand{\bKbar}{\bar{\bK}}
+\newcommand{\bxbar}{\bar{\boldsymbol{x}}}
+\newcommand{\bffbar}{\bar{\bff}}
+\newcommand{\bX}{\boldsymbol{X}}
+\newcommand{\bM}{\boldsymbol{\textbf{M}}}
+\newcommand{\bN}{\boldsymbol{N}}
+\newcommand{\bO}{\boldsymbol{O}}
+\newcommand{\bP}{\boldsymbol{P}}
+\newcommand{\bR}{\boldsymbol{R}}
+\newcommand{\bS}{\boldsymbol{S}}
+\newcommand{\bT}{\boldsymbol{T}}
+\newcommand{\bU}{\boldsymbol{U}}
+\newcommand{\bW}{\boldsymbol{W}}
+\newcommand{\rhoTilde}{\widetilde{\rho}}
+\newcommand{\bphi}{\boldsymbol{\phi}}
+\newcommand{\bLam}{\boldsymbol{\Lambda}}
+\newcommand{\tbar}{\bar{\bt}}
+\newcommand{\ubar}{\bar{\bu}}
+\newcommand{\ubarn}{\bar{u}}
+\newcommand{\uhat}{\hat{\bu}}
+\newcommand{\fhat}{\hat{\bff}}
+\newcommand{\ghat}{\hat{\bg}}
+\newcommand{\phihat}{\hat{\bphi}}
+\newcommand{\lambar}{\bar{\lambda}}
+\newcommand{\phibar}{\bar{\phi}}
+\newcommand{\psibar}{\bar{\psi}}
+\newcommand{\Psibar}{\bar{\Psi}}
+\newcommand{\rhobar}{\bar{\rho}}
+\newcommand{\rhoin}[2]{\rho_{\text{in}}^{{#1}^{(#2)}}}
+\newcommand{\rhoout}[2]{\rho_{\text{out}}^{{#1}^{(#2)}}}
+\newcommand{\rhoinout}[2]{\rho_{\text{in(out)}}^{{#1}^{(#2)}}}
+\newcommand{\epsilonbar}{\bar{\epsilon_{i}}}
+\newcommand{\mubar}{\bar{\mu}}
+\newcommand{\bvPhi}{\boldsymbol{\varPhi}}
+\newcommand{\Vbar}{\bar{V}}
+\newcommand{\psin}{\widetilde{\psi}_n}
+\newcommand{\Psin}{\widetilde{\bPsi}}
+\newcommand{\wbar}{\bar{w}}
+\newcommand{\intomega}{\int_{\varOmega}}
+\newcommand{\domega}{\;d\varOmega}
+\newcommand{\dr}{\,d\br}
+\newcommand{\dx}{\,d\bx}
+\newcommand{\btH}{\boldsymbol{\widetilde{\textbf{H}}}}
+\newcommand{\tN}{\widetilde{N}}
+\definecolor{hellgruen}{rgb}{0.2,0.7,0.2}
+\newcommand{\cb}{\color{blue}}
+\newcommand{\cred}{\color{red}}
+\newcommand{\cn}{\color{black}}
+\newcommand{\cm}{\color{magenta}}
+\newcommand{\cbh}{\color{hellgruen}}
+\newcommand{\bPhi}{\boldsymbol{\Phi}}
+\newcommand{\chieps}{\,\chi_{\varepsilon}(\bx)\,}
+\newcommand{\bxprime}{\boldsymbol{\textbf{x}^{\prime}}}
+\newcommand{\bxdprime}{\boldsymbol{\textbf{x}^{\prime\prime}}}
+\newcommand{\bdir}{\boldsymbol{\Upsilon}}
+\newcommand{\atzero}{\bigg|_{\varepsilon = 0}}
+\newcommand{\derveps}{\frac{d}{d\varepsilon}}
+\newcommand{\innerproductcomma}[2]{\langle #1, #2 \rangle}
+\usepackage{makecell}
+\newcommand{\order}{\mathcal{O}}
+\renewcommand\theadalign{bc}
+\renewcommand\theadfont{\bfseries}
+\renewcommand\theadgape{\Gape[4pt]}
+\renewcommand\cellgape{\Gape[4pt]}
+
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,decorations.pathreplacing,arrows,decorations.markings,positioning,shapes,matrix}
+\tikzstyle{vecArrow} = [thick, decoration={markings,mark=at position
+   1 with {\arrow[semithick]{open triangle 60}}}, double distance=1.4pt, shorten >= 5.5pt,
+   preaction = {decorate}, postaction = {draw,line width=1.4pt, white,shorten >= 4.5pt}]
+\tikzset{mynode/.style={rectangle,rounded corners,draw=black, top color=white, bottom color=yellow!50,very thick, inner sep=0.5em, minimum size=1em, text centered},
+         myarrow/.style={->, >=latex', shorten >=1pt, thick},
+         mylabel/.style={text width=7em, text centered}}
+\tikzset{myarrow/.style={draw, fill=orange, single arrow, minimum height=4.5ex, single arrow head extend=0.5ex}}
+\tikzset{myarrowsmall/.style={draw, fill=orange, single arrow, minimum height=4.5ex, single arrow head extend=0.25ex}}
+\newcommand{\arrowup}{\tikz [baseline=-0.5ex]{\node [myarrow,rotate=90] {};}}
+\newcommand{\arrowdown}{\tikz [baseline=-1ex]{\node [myarrow,rotate=-90] {};}}
+\newcommand{\arrowright}{\tikz [baseline=-1ex]{\node [myarrow] {};}}
+\newcommand{\arrowrightsmall}{\tikz [baseline=-1ex]{\node [myarrowsmall] {};}}
+\newtcolorbox{myboxii}[1][]{breakable,freelance,title=#1,colback=white,
+  colbacktitle=white,coltitle=black,fonttitle=\bfseries,bottomrule=0pt,boxrule=0pt,colframe=white,
+  overlay unbroken and first={\draw[red!75!black,line width=3pt]([xshift=5pt]frame.north west)--(frame.north west)--(frame.south west);
+  \draw[red!75!black,line width=3pt]([xshift=-5pt]frame.north east)--(frame.north east)--(frame.south east);},
+  overlay unbroken app={\draw[red!75!black,line width=3pt,line cap=rect](frame.south west)--([xshift=5pt]frame.south west);
+  \draw[red!75!black,line width=3pt,line cap=rect](frame.south east)--([xshift=-5pt]frame.south east);},
+  overlay middle and last={\draw[red!75!black,line width=3pt](frame.north west)--(frame.south west);
+  \draw[red!75!black,line width=3pt](frame.north east)--(frame.south east);},
+  overlay last app={\draw[red!75!black,line width=3pt,line cap=rect](frame.south west)--([xshift=5pt]frame.south west);
+  \draw[red!75!black,line width=3pt,line cap=rect](frame.south east)--([xshift=-5pt]frame.south east);} }
+
+%========================
+\begin{document}
+% Bigger block titles and bodies
+\setbeamerfont{block title}{size=\Large,series=\bfseries}
+\setbeamerfont{block body}{size=\large}
+% Optional: make normal text a tad bigger too
+\setbeamerfont{normal text}{size=\large}
+
+%========================
+% PAGE 1
+%========================
+%========================
+% PAGE 1 — FULL POSTER
+%========================
+\begin{frame}[t]
+    %--- Header ---
+    \begin{beamercolorbox}[sep=1em,center,wd=\paperwidth]{postertitle}
+        \usebeamerfont{title}{\huge \textbf{Daemonized DFT-FE: A Persistent Interface for Scalable ab initio Workflows}}\\[0.5em]
+        \usebeamerfont{author}{\Large Mehul Darak, Kartick Ramakrishnan, Phani Motamarri (phanim@iisc.ac.in)}\\[0.3em]
+        \usebeamerfont{institute}{\large Department of Computational and Data Sciences, Indian Institute of Science, Bengaluru, India}
+    \end{beamercolorbox}
+    \vspace{1cm}
+
+    %--- Columns ---
+    \begin{columns}[t]
+
+        %========================
+        % LEFT COLUMN
+        %========================
+        \begin{column}{0.48\paperwidth}
+
+            %--- BLOCK 1: Motivation ---
+            \begin{tcolorbox}[title=Motivation: The I/O Bottleneck]
+                \justifying
+                Traditional couplings between density functional theory (DFT) solvers and workflow engines (e.g., \ASE{}) rely on file-based communication. [cite_start]This approach introduces significant inefficiencies for high-throughput iterative workflows[cite: 7, 18]:
+                \begin{itemize}
+                    \item \textbf{Process Overhead:} Relaunches a new DFT process for every energy/force evaluation.
+                    \item \textbf{I/O Latency:} Repeatedly reloads pseudopotentials and writes intermediate files.
+                    \item \textbf{Data Waste:} Discards valuable wavefunction data, forcing "cold starts" at every step.
+                \end{itemize}
+                
+                \textbf{The Solution:} We introduce a \textbf{socket-driven persistent interface} for \DFTFE{}, a massively parallel real-space finite-element DFT code. [cite_start]This transforms \DFTFE{} into a continuously running service[cite: 11].
+            \end{tcolorbox}
+            \vspace{1em}
+
+            %--- BLOCK 2: Architecture ---
+            \begin{tcolorbox}[title=System Architecture \& Data Flow]
+                \justifying
+                [cite_start]The architecture follows a Client-Server (Driver-Daemon) model adhering to the \textbf{i-PI communication protocol}[cite: 14, 45].
+                
+                \begin{figure}
+                    \centering
+                    % PLACEHOLDER FOR FIGURE 1 from Manuscript
+                    %                     % Ensure you have the image file in the directory
+                    \includegraphics[width=0.95\linewidth]{figure1.png} 
+                    \caption{\textbf{Persistent Service Mode:} The daemon initializes once. [cite_start]For each step, it receives atomic structures, performs the SCF solve reusing previous states, and returns $\{E, \mathbf{F}, \boldsymbol{\sigma}\}$[cite: 30, 31].}
+                \end{figure}
+
+                \begin{itemize}
+                    [cite_start]\item \textbf{Initialization:} MPI setup, mesh generation, and pseudopotential loading occur only once[cite: 36].
+                    \item \textbf{Loop:} Listen $\rightarrow$ Compute $\rightarrow$ Respond.
+                    [cite_start]\item \textbf{Protocol:} JSON messages over lightweight sockets[cite: 46].
+                \end{itemize}
+            \end{tcolorbox}
+            \vspace{1em}
+
+            %--- BLOCK 3: ASE Client Integration ---
+            \begin{tcolorbox}[title=ASE Integration: \texttt{DFTFESocketCalculator}]
+                \justifying
+                [cite_start]The Python client seamlessly replaces file-based workflows with zero code modification for the end-user[cite: 52, 63].
+                
+                \textbf{Example Implementation:}
+                \begin{lstlisting}[language=Python]
+from ase.io import read
+from ase.optimize import BFGS
+from dftfe_socket import DFTFESocketCalculator
+
+# Define Calculator
+calc = DFTFESocketCalculator(
+    command="srun -n 64 dftfe-socket", # HPC Launch
+    xc="PBE", kpts=(2,2,2), h=0.25     # Static Params
+)
+
+atoms = read("structure.cif")
+atoms.calc = calc
+
+# Geometry Optimization (Persistant Session)
+with calc:
+    dyn = BFGS(atoms)
+    dyn.run(fmax=0.02) # Iterative calls over socket
+                \end{lstlisting}
+                [cite_start]Parameters like XC functional and basis size are set once; coordinates are transmitted dynamically[cite: 58].
+            \end{tcolorbox}
+
+        \end{column}
+
+        %========================
+        % RIGHT COLUMN
+        %========================
+        \begin{column}{0.48\paperwidth}
+
+            %--- BLOCK 4: HPC Methodology & Parallelism (HiPC Theme) ---
+            \begin{tcolorbox}[title=HPC Methodology \& Scalability]
+                \justifying
+                \DFTFE{} is designed for scalability on large HPC systems using Finite-Element discretization. [cite_start]The socket interface preserves this massive parallelism[cite: 9, 64].
+                
+                \textbf{Algorithmic Implementation:}
+                \begin{itemize}
+                    \item \textbf{Parallel Execution:} Users launch via standard schedulers (e.g., \texttt{srun -n 256}). [cite_start]The socket mode maintains full MPI parallelism[cite: 66, 70].
+                    [cite_start]\item \textbf{Domain Decomposition:} While Rank 0 manages external socket I/O, all ranks participate in the SCF calculation through \DFTFE{}'s native domain decomposition[cite: 67].
+                    [cite_start]\item \textbf{Communication Efficiency:} The socket overhead is negligible compared to the SCF computation costs for large systems[cite: 68].
+                    [cite_start]\item \textbf{Fault Tolerance:} The persistent connection allows for graceful error handling (e.g., SCF non-convergence) without crashing the pipeline, enabling dynamic parameter adjustment[cite: 73].
+                \end{itemize}
+            \end{tcolorbox}
+            \vspace{1em}
+
+            %--- BLOCK 5: Computational Efficiency ---
+            \begin{tcolorbox}[title=Accelerating Convergence: Warm Starts]
+                \justifying
+                A critical advantage of the daemon mode for Materials Science is the ability to maintain state in memory.
+                
+                \begin{itemize}
+                    [cite_start]\item \textbf{Wavefunction Reuse:} In iterative workflows like MD or relaxation, atomic displacements between steps are small[cite: 42].
+                    [cite_start]\item \textbf{SCF Speedup:} By reusing the density and wavefunctions from the previous step as the initial guess, the number of SCF iterations required for convergence is substantially reduced compared to cold restarts[cite: 13, 43].
+                    [cite_start]\item \textbf{I/O Reduction:} Eliminates filesystem overheads in multi-node environments where repeated read/write operations dominate runtime[cite: 72].
+                \end{itemize}
+            \end{tcolorbox}
+            \vspace{1em}
+            
+            %--- BLOCK 6: Applications & Conclusion ---
+            \begin{tcolorbox}[title=Impact \& Applications, colframe=accentred]
+                \justifying
+                [cite_start]This full-stack integration positions \DFTFE{} as a high-throughput backend for modern scientific workflows[cite: 75, 80].
+                
+                \textbf{Key Applications:}
+                \begin{itemize}
+                    \item \textbf{Ab Initio Molecular Dynamics (AIMD):} Long-timescale simulations.
+                    [cite_start]\item \textbf{Machine Learning:} On-the-fly training of interatomic potentials and active learning[cite: 78].
+                    \item \textbf{Structure Search:} Large-scale geometry optimizations.
+                \end{itemize}
+                
+                [cite_start]\textbf{Conclusion:} The socket interface eliminates redundant initialization and disk I/O while preserving \DFTFE{}'s strong scaling across thousands of cores, bridging the gap between traditional HPC solvers and Python-based automation[cite: 76, 78].
+            \end{tcolorbox}
+            \vspace{1em}
+
+            %--- References & Ack ---
+            \begin{beamercolorbox}[wd=\linewidth, leftskip=1em]{references}
+                \small \textbf{References:}
+                [1] ASE Project, "Communication with calculators over sockets."
+                [2] Ceriotti et al., Comput. Phys. Commun., 2014.
+                [3] Motamarri et al., "DFT-FE 1.0", Comput. Phys. Commun., 2022.
+                
+                \vspace{0.5em}
+                [cite_start]\textbf{Acknowledgments:} The authors acknowledge the support of IISc's MATRIX Lab[cite: 82].
+            \end{beamercolorbox}
+
+        \end{column}
+    \end{columns}
+\end{frame}
+\end{document}

@@ -1,0 +1,29 @@
+\begin{block}{socket-driven workflow}
+\centering
+\begin{tikzpicture}[
+    node distance=2.6cm and 1.2cm,
+    box/.style={rectangle,rounded corners,draw=black,thick,fill=gray!10,
+                minimum width=2.7cm,minimum height=1cm,align=center,font=\small},
+    arr/.style={-Latex,thick},
+    every node/.style={font=\small}
+]
+
+% Nodes
+\node[box,fill=blue!10] (client) {Client};
+\node[box,fill=white,right=of client] (json) {JSON / Request–Response};
+\node[box,fill=orange!15,right=of json] (daemon) {Daemon};
+
+% Arrows
+\draw[arr] (client) -- node[above]{Send structure} (json);
+\draw[arr] (json) -- node[above]{Forward to daemon} (daemon);
+\draw[arr,bend right=25] (daemon.south west) to node[below]{Return results} (client.south east);
+
+\end{tikzpicture}
+
+\vspace{0.8em}
+{\scriptsize
+\textit{Initialize} $\to$ \textit{connect} $\to$ \textit{receive atoms/cell} $\to$ 
+\textit{update \& SCF} $\to$ 
+\textit{return \{E, $\mathbf{F}$, $\boldsymbol{\sigma}$\}} $\to$ \textit{wait.}
+}
+\end{block}
